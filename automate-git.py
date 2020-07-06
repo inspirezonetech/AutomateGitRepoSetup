@@ -10,7 +10,6 @@ from pathlib import Path
 def create_local_git_repo():
     
     #ask for repo directory
-    global directory #TODO avoid use of global
     directory = input("Enter repo directory path: ")
 
     #create directory if it doesn't exist
@@ -21,7 +20,6 @@ def create_local_git_repo():
         subprocess.run(["mkdir", directory])
 
     #ask for repo name
-    global repo_name #TODO avoid use of global
     repo_name = input("Enter repo name: ") 
 
     directory = directory + '/' + repo_name
@@ -37,12 +35,12 @@ def create_local_git_repo():
         subprocess.run(["git", "init"], cwd=directory)
 
     pass
+    return directory, repo_name
 
 
-def create_local_repo_file():
+def create_local_repo_file(directory):
 
     #ask for file name
-    global first_file #TODO avoid use of global
     first_file = input("Enter name of first file to commit: ")
 
     #create file if it doesn't exist
@@ -52,15 +50,16 @@ def create_local_repo_file():
     else:
         subprocess.run(["touch", first_file], cwd=directory)
     pass
+    return first_file
 
 
-def add_files_for_commit():
+def add_files_for_commit(directory, first_file):
 
     #stage file created
     subprocess.run(["git", "add", first_file], cwd=directory)
     pass
 
-def commit_files():
+def commit_files(directory):
 
     #enter commit message
     msg = input("Enter commit message: ")
@@ -74,10 +73,9 @@ def commit_files():
 
 #--------------- remote setup ---------------#
 
-def create_github_repo():
+def create_github_repo(repo_name):
 
     #ask for user github account name
-    global github_name #TODO avoid use of global
     github_name  = input("Enter your github user name: ")
 
     #generate data for request, set repo to private
@@ -95,7 +93,6 @@ def create_github_repo():
     #confirm repo is created and extract url
     for repo_id in range(len(response_json)):        
         remote_name = response_json[repo_id]['name']
-        global remote_url #TODO avoid use of global
         remote_url = response_json[repo_id]['html_url'] 
         # print(remote_name) 
         # print(remote_url) 
@@ -104,25 +101,26 @@ def create_github_repo():
             print("Repo now created on github")
             break
     pass
+    return github_name, remote_url
 
 
 
 
 #--------------- link local and remote ---------------#
 
-def add_remote_repo_url():
+def add_remote_repo_url(directory, remote_url):
 
     #url for repo
-    global server #TODO avoid use of global
     server = remote_url + ".git"
     print("server: %s" %server)
 
     #add as origin
     subprocess.run(["git", "remote", "add", "origin", server], cwd=directory)
     pass
+    return server
 
 
-def push_local_repo_to_remote():
+def push_local_repo_to_remote(directory, github_name, server):
 
     #insert username to origin url
     push_url = server.replace("//", "//%s@" %github_name)
@@ -138,13 +136,13 @@ def push_local_repo_to_remote():
 def start_program_flow():
     
     print("------ Start ------")
-    create_local_git_repo()
-    create_local_repo_file()
-    add_files_for_commit()
-    commit_files()
-    create_github_repo()
-    add_remote_repo_url()
-    push_local_repo_to_remote()
+    r_directory, r_repo_name = create_local_git_repo()
+    r_first_file = create_local_repo_file(r_directory)
+    add_files_for_commit(r_directory, r_first_file)
+    commit_files(r_directory)
+    r_github_name, r_remote_url = create_github_repo(r_repo_name)
+    r_server = add_remote_repo_url(r_directory, r_remote_url)
+    push_local_repo_to_remote(r_directory, r_github_name, r_server)
 
 def main():
     start_program_flow()
