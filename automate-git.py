@@ -3,14 +3,19 @@
 import subprocess
 import json
 from pathlib import Path
+from configparser import ConfigParser
 
+# config file contains user settings
+config_file = 'config.ini'
+config = ConfigParser()
+config.read(config_file)
 
 #--------------- local set up ---------------#
 
 def create_local_git_repo():
     
-    #ask for repo directory
-    directory = input("Enter repo directory path: ")
+    # set directory to create repo
+    directory = config.get('your_settings', 'directory')
 
     #create directory if it doesn't exist
     check_dir = Path(directory)
@@ -19,8 +24,8 @@ def create_local_git_repo():
     else:
         subprocess.run(["mkdir", directory])
 
-    #ask for repo name
-    repo_name = input("Enter repo name: ") 
+    # set repo name
+    repo_name = config.get('your_settings', 'repo_name')
 
     directory = directory + '/' + repo_name
     print("You selected repo %s" %directory)
@@ -40,11 +45,12 @@ def create_local_git_repo():
 
 def create_local_repo_file(directory):
 
-    #ask for file name
-    first_file = input("Enter name of first file to commit: ")
+    # set file to commit
+    first_file = config.get('your_settings', 'commit_file')
+    file_path = directory + "/" + first_file
 
     #create file if it doesn't exist
-    check_file = Path(first_file)
+    check_file = Path(file_path)
     if check_file.exists():
         print("File already exists. Skip create file") 
     else:
@@ -61,8 +67,8 @@ def add_files_for_commit(directory, first_file):
 
 def commit_files(directory):
 
-    #enter commit message
-    msg = input("Enter commit message: ")
+    # set commit message
+    msg = config.get('your_settings', 'first_commit_msg')
 
     #commit file
     subprocess.run(["git", "commit", "-m", msg], cwd=directory)
@@ -76,14 +82,14 @@ def commit_files(directory):
 def create_github_repo(repo_name, auth_type):
 
     #ask for user github account name
-    github_name  = input("Enter your github user name: ")
+    github_name  = config.get('your_settings', 'github_name')
 
     #generate data for request, set repo to private
     repo_config = '{"name": "%s", "private": "true"}' %repo_name
 
     #create repo
-    if auth_type == '1':
-        access_token = read_token_from_file()
+    if auth_type == 'token':
+        access_token = config.get('your_settings', 'your_token')
         header = 'Authorization: token ' + access_token
         response = subprocess.run(["curl", "--header", header, "--data", repo_config, "https://api.github.com/user/repos"], check=True, stdout=subprocess.PIPE)
     
@@ -91,7 +97,7 @@ def create_github_repo(repo_name, auth_type):
         response = subprocess.run(["curl", "--user", github_name, "--data", repo_config, "https://api.github.com/user/repos"], check=True, stdout=subprocess.PIPE)
 
     #confirm repo now exists under user
-    if auth_type == '1':
+    if auth_type == 'token':
         response = subprocess.run(["curl", "--header", header, "--request", "GET", "https://api.github.com/user/repos"], check=True, stdout=subprocess.PIPE)
     
     else:
@@ -123,8 +129,8 @@ def add_remote_repo_url(directory, github_name, remote_url, auth_type):
     server = remote_url + ".git"
     print("server: %s" %server)
     
-    if auth_type == '1':
-        access_token = read_token_from_file()
+    if auth_type == 'token':
+        access_token = config.get('your_settings', 'your_token')
         server = server.replace("//", "//%s:%s@" %(github_name, access_token))
 
     else:
@@ -151,30 +157,32 @@ def push_local_repo_to_remote(directory, server):
     
 
 def remote_auth_option():
-
     print("Select authentication type to github")
-    auth_type = input("Personal Access Token (enter 1) or Password (enter 2)?: ") 
 
-    if auth_type == '1':
+    auth_type = config.get('your_settings', 'auth_type')
+
+    if auth_type == 'token':
         print("Using Token")
-        
-    else:
+    elif auth_type == "login":
         print("Using Password")
+    else:
+        print("ERROR! Ivalid option for authorisation type in config.ini file")
+        exit()
 
     pass
     return auth_type
 
 
-def read_token_from_file():
+# def read_token_from_file():
 
-    TOKEN_LEN = 40
+#     TOKEN_LEN = 40
     
-    #read token from file
-    with open('token', 'r') as token_file:
-        token = token_file.read(TOKEN_LEN)
-        print("Access token found: %s" %token)
+#     #read token from file
+#     with open('token', 'r') as token_file:
+#         token = token_file.read(TOKEN_LEN)
+#         print("Access token found: %s" %token)
 
-    return token
+#     return token
 
 
 def start_program_flow():
