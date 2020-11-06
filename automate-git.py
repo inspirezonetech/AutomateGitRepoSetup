@@ -9,8 +9,7 @@ config = ConfigParser()
 config.read(config_file)
 
 # get all settings from config
-auth_type = config.get('your_settings', 'auth_type')
-access_token = config.get('your_settings', 'your_token')
+access_token = config.get('your_settings', 'github_token')
 repo_name = config.get('your_settings', 'repo_name')
 first_file = config.get('your_settings', 'commit_file')
 msg = config.get('your_settings', 'first_commit_msg')
@@ -45,7 +44,7 @@ def create_local_git_repo():
 def create_local_repo_file():
 
     file_path = repo_directory + "/" + first_file
-    print(file_path)
+    print("Adding file: %s" % file_path)
 
     # create file if it doesn't exist
     check_file = Path(file_path)
@@ -77,19 +76,11 @@ def create_github_repo():
     repo_config = '{"name": "%s", "private": "true"}' % repo_name
 
     # create repo
-    if auth_type == 'token':
-        header = 'Authorization: token ' + access_token
-        response = subprocess.run(["curl", "--header", header, "--data", repo_config, "https://api.github.com/user/repos"], check=True, stdout=subprocess.PIPE)
-
-    else:
-        response = subprocess.run(["curl", "--user", github_name, "--data", repo_config, "https://api.github.com/user/repos"], check=True, stdout=subprocess.PIPE)
+    header = 'Authorization: token ' + access_token
+    response = subprocess.run(["curl", "--header", header, "--data", repo_config, "https://api.github.com/user/repos"], check=True, stdout=subprocess.PIPE)
 
     # confirm repo now exists under user
-    if auth_type == 'token':
-        response = subprocess.run(["curl", "--header", header, "--request", "GET", "https://api.github.com/user/repos"], check=True, stdout=subprocess.PIPE)
-
-    else:
-        response = subprocess.run(["curl", "--user", github_name, "--request", "GET", "https://api.github.com/user/repos"], check=True, stdout=subprocess.PIPE)
+    response = subprocess.run(["curl", "--header", header, "--request", "GET", "https://api.github.com/user/repos"], check=True, stdout=subprocess.PIPE)
 
     # convert from completed process for easier parsing
     response_json = json.loads(response.stdout.decode("utf-8"))
@@ -114,12 +105,7 @@ def add_remote_repo_url(remote_url):
     server = remote_url + ".git"
     print("server: %s" % server)
 
-    if auth_type == 'token':
-        server = server.replace("//", "//%s:%s@" % (github_name, access_token))
-
-    else:
-        server = server.replace("//", "//%s@" % (github_name))
-
+    server = server.replace("//", "//%s:%s@" % (github_name, access_token))
     print("server: %s" % server)
 
     # set origin
@@ -140,25 +126,9 @@ def push_local_repo_to_remote(server):
     pass
 
 
-def remote_auth_option():
-    print("Select authentication type to github")
-
-    if auth_type == 'token':
-        print("Using Token")
-    elif auth_type == "login":
-        print("Using Password")
-    else:
-        print("ERROR! Ivalid option for authorisation type in config.ini file")
-        exit()
-
-    pass
-
-
 def start_program_flow():
 
     print("------ Start ------")
-
-    remote_auth_option()
 
     create_local_git_repo()
 
