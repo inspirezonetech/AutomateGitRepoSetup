@@ -2,6 +2,7 @@ import subprocess
 import json
 from pathlib import Path
 from configparser import ConfigParser
+import shlex
 
 # config file contains user settings
 config_file = 'config.ini'
@@ -126,6 +127,15 @@ def push_local_repo_to_remote(server):
     pass
 
 
+def run_custom_cmd():
+
+    # run the command listed in config file
+    run_cmd = config.get('your_settings', 'cmd')
+    cmd_split = shlex.split(run_cmd)
+    subprocess.run(cmd_split, cwd=repo_directory)
+    pass
+
+
 def start_program_flow():
 
     print("------ Start ------")
@@ -143,6 +153,8 @@ def start_program_flow():
     r_server = add_remote_repo_url(r_remote_url)
 
     push_local_repo_to_remote(r_server)
+
+    run_custom_cmd()
 
     pass
 
