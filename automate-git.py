@@ -29,9 +29,9 @@ def create_local_git_repo():
     else:
         subprocess.run(["mkdir", pc_directory])
 
+    # create repo folder if it doesn't exist
     print("Creating repo: %s" % repo_directory)
 
-    # create repo folder if it doesn't exist
     check_repo = Path(repo_directory)
     if check_repo.exists():
         print("Repo already exists. Skip git init")
@@ -78,7 +78,7 @@ def create_github_repo():
 
     # create repo
     header = 'Authorization: token ' + access_token
-    response = subprocess.run(["curl", "--header", header, "--data", repo_config, "https://api.github.com/user/repos"], check=True, stdout=subprocess.PIPE)
+    subprocess.run(["curl", "--header", header, "--data", repo_config, "https://api.github.com/user/repos"], check=True, stdout=subprocess.PIPE)
 
     # confirm repo now exists under user
     response = subprocess.run(["curl", "--header", header, "--request", "GET", "https://api.github.com/user/repos"], check=True, stdout=subprocess.PIPE)
@@ -89,10 +89,10 @@ def create_github_repo():
     # confirm repo is created and extract url
     for repo_id in range(len(response_json)):
         remote_name = response_json[repo_id]['name']
-        remote_url = response_json[repo_id]['html_url']
 
         if(remote_name == repo_name):
             print("Repo now created on github")
+            remote_url = response_json[repo_id]['html_url']
             break
 
     return remote_url
@@ -129,6 +129,7 @@ def run_custom_cmd():
     run_cmd = config.get('your_settings', 'cmd')
     print("Run custom command: %s" % run_cmd)
 
+    # convert the user command from string to shell syntax
     cmd_split = shlex.split(run_cmd)
     subprocess.run(cmd_split, cwd=repo_directory)
     pass
