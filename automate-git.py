@@ -1,20 +1,21 @@
 import subprocess
-import json
-from pathlib import Path
-from configparser import ConfigParser
 import shlex
+import json
+from configparser import ConfigParser
+from pathlib import Path
 
 # config file contains user settings
 config_file = 'config.ini'
 config = ConfigParser()
 config.read(config_file)
 
-# get all settings from config
+# get all settings from config file
 access_token = config.get('your_settings', 'github_token')
 repo_name = config.get('your_settings', 'repo_name')
 first_file = config.get('your_settings', 'commit_file')
 msg = config.get('your_settings', 'first_commit_msg')
 github_name = config.get('your_settings', 'github_name')
+
 pc_directory = config.get('your_settings', 'directory')
 repo_directory = pc_directory + '/' + repo_name
 
@@ -28,7 +29,7 @@ def create_local_git_repo():
     else:
         subprocess.run(["mkdir", pc_directory])
 
-    print("You selected repo %s" % repo_directory)
+    print("Creating repo: %s" % repo_directory)
 
     # create repo folder if it doesn't exist
     check_repo = Path(repo_directory)
@@ -67,7 +68,6 @@ def commit_files():
 
     # commit file
     subprocess.run(["git", "commit", "-m", msg], cwd=repo_directory)
-
     pass
 
 
@@ -85,7 +85,6 @@ def create_github_repo():
 
     # convert from completed process for easier parsing
     response_json = json.loads(response.stdout.decode("utf-8"))
-    print("%d repos by user" % len(response_json))
 
     # confirm repo is created and extract url
     for repo_id in range(len(response_json)):
@@ -95,34 +94,31 @@ def create_github_repo():
         if(remote_name == repo_name):
             print("Repo now created on github")
             break
-    pass
+
     return remote_url
 
 
 def add_remote_repo_url(remote_url):
 
-    print(remote_url)
     # url for repo
     server = remote_url + ".git"
-    print("server: %s" % server)
+    print("Repo URL: %s" % server)
 
+    # add access token to url
     server = server.replace("//", "//%s:%s@" % (github_name, access_token))
-    print("server: %s" % server)
 
-    # set origin
-    subprocess.run(["git", "remote", "set-url", "origin", server], cwd=repo_directory)
+    # add remote origin
+    subprocess.run(["git", "remote", "add", "origin", server], cwd=repo_directory)
 
-    pass
     return server
 
 
 def push_local_repo_to_remote(server):
 
-    # insert username to origin url
     push_url = server
-    print("push url: %s" % push_url)
+    print("Pushing to remote...")
 
-    # push to server
+    # push to github repo
     subprocess.run(["git", "push", "-u", push_url, "master"], cwd=repo_directory)
     pass
 
@@ -131,6 +127,8 @@ def run_custom_cmd():
 
     # run the command listed in config file
     run_cmd = config.get('your_settings', 'cmd')
+    print("Run custom command: %s" % run_cmd)
+
     cmd_split = shlex.split(run_cmd)
     subprocess.run(cmd_split, cwd=repo_directory)
     pass
@@ -148,13 +146,15 @@ def start_program_flow():
 
     commit_files()
 
-    r_remote_url = create_github_repo()
+    remote_url = create_github_repo()
 
-    r_server = add_remote_repo_url(r_remote_url)
+    server = add_remote_repo_url(remote_url)
 
-    push_local_repo_to_remote(r_server)
+    push_local_repo_to_remote(server)
 
     run_custom_cmd()
+
+    print("------ Done ------")
 
     pass
 
