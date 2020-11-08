@@ -127,11 +127,12 @@ def run_custom_cmd():
 
     # run the command listed in config file
     run_cmd = config.get('your_settings', 'cmd')
-    print("Run custom command: %s" % run_cmd)
+    if run_cmd != "":
+        print("Run custom command: %s" % run_cmd)
 
-    # convert the user command from string to shell syntax
-    cmd_split = shlex.split(run_cmd)
-    subprocess.run(cmd_split, cwd=repo_directory)
+        # convert the user command from string to shell syntax
+        cmd_split = shlex.split(run_cmd)
+        subprocess.run(cmd_split, cwd=repo_directory)
     pass
 
 
