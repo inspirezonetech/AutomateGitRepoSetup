@@ -1,4 +1,4 @@
-# Contributing to TeachMePythonLikeIm5
+# Contributing to AutomateGitRepoSetup
 
 All inputs are welcome!
 
