@@ -13,6 +13,8 @@ b=$(echo "$a" | cut -d '"' -f 2)
 b=$(echo "$b" | cut -d '[' -f 2)
 # cut ] from string
 b=$(echo "$b" | cut -d ']' -f 2)
+# remove new line character
+b=$(echo "$b" | tr -d '\n')
 
 echo "run-sh: After parsing, file to execute: $b"
 
