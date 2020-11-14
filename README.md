@@ -2,6 +2,7 @@
 
 *You are welcome to contribute to this repo. See the [**CONTRIBUTING.md**](./CONTRIBUTING.md) for more info*
 
+![AutomateGitRepoSetup](https://inspirezone.tech/wp-content/uploads/2020/11/github-api-with-python-1024x512.png)
 ## About this repo
 
 Automate creation of a local repo on your PC and a remote repo on Github.
