@@ -21,4 +21,4 @@ jobs:
         run: |
           pip install pytest gitpython
 
-      - run: pytest test_automate_git
+      - run: pytest test_automate_git.py
