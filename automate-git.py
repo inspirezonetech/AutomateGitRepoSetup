@@ -1,42 +1,50 @@
-import json
-import shlex
 import subprocess
+import shlex
+import json
 from configparser import ConfigParser
 from pathlib import Path
 
-import git
+# config file contains user settings
+config_file = 'config.ini'
+config = ConfigParser()
+config.read(config_file)
+
+# get all settings from config file
+access_token = config.get('your_settings', 'github_token')
+repo_name = config.get('your_settings', 'repo_name')
+first_file = config.get('your_settings', 'commit_file')
+msg = config.get('your_settings', 'first_commit_msg')
+github_name = config.get('your_settings', 'github_name')
+
+pc_directory = config.get('your_settings', 'directory')
+repo_directory = pc_directory + '/' + repo_name
 
 
-def is_git_repo(repo_directory):
-    """
-    Checks if a directory is a git repo
-    :param Path repo_directory: The path of the git dir
-    :return bool: True/False if a git repo
-    """
-    try:
-        _ = git.Repo(repo_directory).git_dir
-        return True
-    except git.exc.InvalidGitRepositoryError:
-        return False
+def create_local_git_repo():
 
+    # create directory if it doesn't exist
+    check_dir = Path(pc_directory)
+    if check_dir.exists():
+        print("Directory exists. Skip create directory")
+    else:
+        subprocess.run(["mkdir", pc_directory])
 
-def create_local_git_repo(repo_directory):
-    """
-    Creates and initialise the repository in the directory specified
-    :param Path repo_directory: Path to repo directory
-    """
-    print(f"Creating repo in {repo_directory}")
+    # create repo folder if it doesn't exist
+    print("Creating repo: %s" % repo_directory)
 
-    try:
-        if is_git_repo(repo_directory):
-            print(f"{repo_directory} already exists and is git repo")
-    except git.exc.NoSuchPathError:
-        print(f"{repo_directory} doesn't exists, creating and initialising")
-        repo_directory.mkdir(parents=True)
-        git.Repo.init(repo_directory)
+    check_repo = Path(repo_directory)
+    if check_repo.exists():
+        print("Repo already exists. Skip git init")
+    else:
+        subprocess.run(["mkdir", repo_directory])
+        # init repo
+        subprocess.run(["git", "init"], cwd=repo_directory)
+
+    pass
 
 
 def create_local_repo_file():
+
     file_path = repo_directory + "/" + first_file
     print("Adding file: %s" % file_path)
 
@@ -50,31 +58,30 @@ def create_local_repo_file():
 
 
 def add_files_for_commit():
+
     # stage file created
     subprocess.run(["git", "add", first_file], cwd=repo_directory)
     pass
 
 
 def commit_files():
+
     # commit file
     subprocess.run(["git", "commit", "-m", msg], cwd=repo_directory)
     pass
 
 
 def create_github_repo():
+
     # generate data for request, set repo to private
     repo_config = '{"name": "%s", "private": "true"}' % repo_name
 
     # create repo
     header = 'Authorization: token ' + access_token
-    subprocess.run(["curl", "--header", header, "--data", repo_config,
-                    "https://api.github.com/user/repos"], check=True,
-                   stdout=subprocess.PIPE)
+    subprocess.run(["curl", "--header", header, "--data", repo_config, "https://api.github.com/user/repos"], check=True, stdout=subprocess.PIPE)
 
     # confirm repo now exists under user
-    response = subprocess.run(["curl", "--header", header, "--request", "GET",
-                               "https://api.github.com/user/repos"], check=True,
-                              stdout=subprocess.PIPE)
+    response = subprocess.run(["curl", "--header", header, "--request", "GET", "https://api.github.com/user/repos"], check=True, stdout=subprocess.PIPE)
 
     # convert from completed process for easier parsing
     response_json = json.loads(response.stdout.decode("utf-8"))
@@ -83,7 +90,7 @@ def create_github_repo():
     for repo_id in range(len(response_json)):
         remote_name = response_json[repo_id]['name']
 
-        if (remote_name == repo_name):
+        if(remote_name == repo_name):
             print("Repo now created on github")
             remote_url = response_json[repo_id]['html_url']
             break
@@ -92,6 +99,7 @@ def create_github_repo():
 
 
 def add_remote_repo_url(remote_url):
+
     # url for repo
     server = remote_url + ".git"
     print("Repo URL: %s" % server)
@@ -106,6 +114,7 @@ def add_remote_repo_url(remote_url):
 
 
 def push_local_repo_to_remote(server):
+
     push_url = server
     print("Pushing to remote...")
 
@@ -115,6 +124,7 @@ def push_local_repo_to_remote(server):
 
 
 def run_custom_cmd():
+
     # run the command listed in config file
     run_cmd = config.get('your_settings', 'cmd')
     if run_cmd != "":
@@ -127,24 +137,10 @@ def run_custom_cmd():
 
 
 def start_program_flow():
-    # config file contains user settings
-    config_file = 'config.ini'
-    config = ConfigParser()
-    config.read(config_file)
-
-    # get all settings from config file
-    access_token = config.get('your_settings', 'github_token')
-    repo_name = config.get('your_settings', 'repo_name')
-    first_file = config.get('your_settings', 'commit_file')
-    msg = config.get('your_settings', 'first_commit_msg')
-    github_name = config.get('your_settings', 'github_name')
-
-    pc_directory = config.get('your_settings', 'directory')
-    repo_directory = pc_directory + '/' + repo_name
 
     print("------ Start ------")
 
-    create_local_git_repo(pc_directory)
+    create_local_git_repo()
 
     create_local_repo_file()
 
