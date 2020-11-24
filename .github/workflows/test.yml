@@ -20,6 +20,8 @@ jobs:
         run: |
           pip install pytest gitpython
 
-      - run: pytest test_automate_git.py
-        with:
-          path: test
+      - name: Run tests
+        run: |
+          pytest test_automate_git.py
+        working-directory: test
+
