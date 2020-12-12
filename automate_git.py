@@ -4,23 +4,30 @@ import json
 from configparser import ConfigParser
 from pathlib import Path
 
-# config file contains user settings
-config_file = 'config.ini'
-config = ConfigParser()
-config.read(config_file)
 
-# get all settings from config file
-access_token = config.get('your_settings', 'github_token')
-repo_name = config.get('your_settings', 'repo_name')
-first_file = config.get('your_settings', 'commit_file')
-msg = config.get('your_settings', 'first_commit_msg')
-github_name = config.get('your_settings', 'github_name')
+def setup_config():
 
-pc_directory = config.get('your_settings', 'directory')
-repo_directory = pc_directory + '/' + repo_name
+    # config file contains user settings
+    config_file = 'config.ini'
+    config = ConfigParser()
+    config.read(config_file)
+
+    # get all settings from config file
+    access_token = config.get('your_settings', 'github_token')
+    repo_name = config.get('your_settings', 'repo_name')
+    first_file = config.get('your_settings', 'commit_file')
+    msg = config.get('your_settings', 'first_commit_msg')
+    github_name = config.get('your_settings', 'github_name')
+
+    pc_directory = config.get('your_settings', 'directory')
+    repo_directory = pc_directory + '/' + repo_name
+
+    run_cmd = config.get('your_settings', 'cmd')
+
+    return access_token, repo_name, first_file, msg, github_name, pc_directory, repo_directory, run_cmd
 
 
-def create_local_git_repo():
+def create_local_git_repo(pc_directory, repo_directory):
 
     # create directory if it doesn't exist
     check_dir = Path(pc_directory)
@@ -43,7 +50,7 @@ def create_local_git_repo():
     pass
 
 
-def create_local_repo_file():
+def create_local_repo_file(first_file, repo_directory):
 
     file_path = repo_directory + "/" + first_file
     print("Adding file: %s" % file_path)
@@ -57,21 +64,21 @@ def create_local_repo_file():
     pass
 
 
-def add_files_for_commit():
+def add_files_for_commit(first_file, repo_directory):
 
     # stage file created
     subprocess.run(["git", "add", first_file], cwd=repo_directory)
     pass
 
 
-def commit_files():
+def commit_files(msg, repo_directory):
 
     # commit file
     subprocess.run(["git", "commit", "-m", msg], cwd=repo_directory)
     pass
 
 
-def create_github_repo():
+def create_github_repo(repo_name, access_token):
 
     # generate data for request, set repo to private
     repo_config = '{"name": "%s", "private": "true"}' % repo_name
@@ -98,7 +105,7 @@ def create_github_repo():
     return remote_url
 
 
-def add_remote_repo_url(remote_url):
+def add_remote_repo_url(remote_url, github_name, access_token, repo_directory):
 
     # url for repo
     server = remote_url + ".git"
@@ -113,7 +120,7 @@ def add_remote_repo_url(remote_url):
     return server
 
 
-def push_local_repo_to_remote(server):
+def push_local_repo_to_remote(server, repo_directory):
 
     push_url = server
     print("Pushing to remote...")
@@ -123,10 +130,9 @@ def push_local_repo_to_remote(server):
     pass
 
 
-def run_custom_cmd():
+def run_custom_cmd(run_cmd, repo_directory):
 
     # run the command listed in config file
-    run_cmd = config.get('your_settings', 'cmd')
     if run_cmd != "":
         print("Run custom command: %s" % run_cmd)
 
@@ -140,21 +146,23 @@ def start_program_flow():
 
     print("------ Start ------")
 
-    create_local_git_repo()
+    access_token, repo_name, first_file, msg, github_name, pc_directory, repo_directory, run_cmd = setup_config()
 
-    create_local_repo_file()
+    create_local_git_repo(pc_directory, repo_directory)
 
-    add_files_for_commit()
+    create_local_repo_file(first_file, repo_directory)
 
-    commit_files()
+    add_files_for_commit(first_file, repo_directory)
 
-    remote_url = create_github_repo()
+    commit_files(msg, repo_directory)
 
-    server = add_remote_repo_url(remote_url)
+    remote_url = create_github_repo(repo_name, access_token)
 
-    push_local_repo_to_remote(server)
+    server = add_remote_repo_url(remote_url, github_name, access_token, repo_directory)
 
-    run_custom_cmd()
+    push_local_repo_to_remote(server, repo_directory)
+
+    run_custom_cmd(run_cmd, repo_directory)
 
     print("------ Done ------")
 
