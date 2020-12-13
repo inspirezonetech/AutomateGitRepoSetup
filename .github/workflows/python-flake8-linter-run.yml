@@ -27,6 +27,6 @@ jobs:
         
     # run linter on python file
     - name: Run Lint with flake8!
-      run: flake8 . --ignore E302,E305,E501 --isolated --count --max-complexity=10 --statistics --show-source
+      run: flake8 . --ignore E501 --isolated --count --max-complexity=10 --statistics --show-source
         
     

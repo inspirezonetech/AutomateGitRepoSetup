@@ -25,34 +25,32 @@ Go to the [issue](https://github.com/inspirezonetech/AutomateGitRepoSetup/issues
 
 ## Contributions you can make to this project
 
-- Add or propose a new feature
-- Propose an improvement Discuss current state of code
+- Add a new feature
 - Report a bug
 - Submit a bug fix
 - Help with documentation
+- Discuss current state of code
 - Make any suggestion for improvement
 
 ## Guidelines for adding a new feature to the script
 
 - Please make sure you've made your intention known first in the [issues](https://github.com/inspirezonetech/AutomateGitRepoSetup/issues) section
 - Outline in the relevant issue how you may go about adding this feature
-- New features should be adding as a separate function if possible
+- New features should be added as a separate function if possible
 
 ## Use [flake8]((https://flake8.pycqa.org/en/latest/)) linting to ensure format of code is consistent with repo
 
 Run flake8 on your python file before submitting.
 
-The following flake8 errors can be excluded 
-- `E302 expected 2 blank lines, found 1`
-- `expected 2 blank lines after class or function definition, found 1 flake8(E305)`
+The following flake8 errors can be excluded:
 - `line too long (x > x characters) flake8(E501)`
 
-How to run flake8 using command line:
+How to run flake8 lint check on your code using command line:
 ```
 python -m pip install flake8
 
 # runs flake8 and ignores the 3 errors
-flake8 path/to/code/to/check.py --ignore E302,E305,E501
+flake8 path/to/code/to/check.py --ignore E501
 ```
 
 ## How to submit your code - step by step guide

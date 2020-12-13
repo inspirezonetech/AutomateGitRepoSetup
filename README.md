@@ -1,8 +1,15 @@
 # AutomateGitRepoSetup
 
-*You are welcome to contribute to this repo. See the [**CONTRIBUTING.md**](./CONTRIBUTING.md) for more info*
+*You are welcome to contribute to this repo. See the [**CONTRIBUTING.md**](./CONTRIBUTING.md) for more info.*
 
 ![AutomateGitRepoSetup](https://inspirezone.tech/wp-content/uploads/2020/11/github-api-with-python-1024x512.png)
+
+## Tutorial available
+
+A full tutorial walking you through this program is detailed on the [inspirezone.tech](https://inspirezone.tech) blog post: [Github API use case: Automate git local and remote repo setup with Python](https://inspirezone.tech/automate-git-local-and-remote-repo-setup-python/). 
+
+The repo source files have gone through major modifications since the tutorial was written. You can see the original tutorial files under the folder [blog-tutorial-original-code/](blog-tutorial-original-code/). Use the code found in this folder to follow along with the blog tutorial.
+
 ## About this repo
 
 Automate creation of a local repo on your PC and a remote repo on Github.
@@ -14,8 +21,6 @@ One a single run of the script it will:
 - Create a repo on Github using same name as local repo
 - Get origin URL for created repo on Github
 - Push local repo to Github repo
-
-A full tutorial for this program is detailed on the inspirezone.tech blog post: [Github API use case: Automate git local and remote repo setup with Python](https://inspirezone.tech/automate-git-local-and-remote-repo-setup-python/).
 
 ## Technologies used
 
@@ -66,7 +71,7 @@ The github_token is a personal access token generated from your Github account. 
 ### Step 3: Run the script
 Run python script using
 ```
-python automate-git.py
+python automate_git.py
 ```
 
 
