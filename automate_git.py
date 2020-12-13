@@ -5,10 +5,12 @@ from configparser import ConfigParser
 from pathlib import Path
 
 
-def setup_config():
+def setup_config(config_file=None):
+
+    if config_file is None:
+        config_file = 'config.ini'
 
     # config file contains user settings
-    config_file = 'config.ini'
     config = ConfigParser()
     config.read(config_file)
 
@@ -142,11 +144,11 @@ def run_custom_cmd(run_cmd, repo_directory):
     pass
 
 
-def start_program_flow():
+def start_program_flow(config_file=None):
 
     print("------ Start ------")
 
-    access_token, repo_name, first_file, msg, github_name, pc_directory, repo_directory, run_cmd = setup_config()
+    access_token, repo_name, first_file, msg, github_name, pc_directory, repo_directory, run_cmd = setup_config(config_file)
 
     create_local_git_repo(pc_directory, repo_directory)
 
