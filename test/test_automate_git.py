@@ -37,7 +37,7 @@ def generate_test_config():
 # The config file must be generated before the application is loaded to ensure the data
 # is loaded by the application
 generate_test_config()
-execfile('../automate-git.py')
+execfile('../automate_git.py')
 
 
 def mock_json_loads(response_output):
