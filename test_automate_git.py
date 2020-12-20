@@ -5,6 +5,7 @@ from pathlib import Path
 
 import git
 from py._builtin import execfile
+from automate_git import start_program_flow
 
 
 def generate_test_config():
@@ -29,7 +30,7 @@ def generate_test_config():
     config[base_config_key]['directory'] = directory
     config[base_config_key]['cmd'] = 'touch another_file'
 
-    config_file = 'config.ini'
+    config_file = 'test_config.ini'
     with open(config_file, 'w') as fh:
         config.write(fh)
 
@@ -37,7 +38,7 @@ def generate_test_config():
 # The config file must be generated before the application is loaded to ensure the data
 # is loaded by the application
 generate_test_config()
-execfile('../automate_git.py')
+execfile('automate_git.py')
 
 
 def mock_json_loads(response_output):
@@ -58,7 +59,7 @@ def test_program_flow(monkeypatch):
     monkeypatch.setattr(json, 'loads', mock_json_loads)
 
     # Run the main application flow
-    start_program_flow()
+    start_program_flow('test_config.ini')
 
     # Get a path object for the repo defined in the config and create a git repo object
     # for further testing
