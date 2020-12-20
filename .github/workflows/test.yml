@@ -23,5 +23,3 @@ jobs:
       - name: Run tests
         run: |
           pytest test_automate_git.py
-        working-directory: test
-
