@@ -74,4 +74,18 @@ Run python script using
 python automate_git.py
 ```
 
+## Running the test program using pytest
 
+The file `test_automate_git.py` is used to execute a test program to check basic functionality of the application.
+
+To run the test do the following:
+
+Install modules `pytest` and `gitpython` using `requirements.txt`.
+```
+pip install -r requirements.txt
+```
+
+Execute the test program
+```
+pytest test_automate_git.py
+```
