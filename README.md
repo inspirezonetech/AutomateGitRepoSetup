@@ -2,7 +2,9 @@
 
 *You are welcome to contribute to this repo. See the [**CONTRIBUTING.md**](./CONTRIBUTING.md) for more info.*
 
-![AutomateGitRepoSetup](https://inspirezone.tech/wp-content/uploads/2020/11/github-api-with-python-1024x512.png)
+<img src="https://inspirezone.tech/wp-content/uploads/2021/10/Accepting-Contributions-for-Hacktoberfest-2021.png" width="300">
+
+[![AutomateGitRepoSetup](https://inspirezone.tech/wp-content/uploads/2020/11/github-api-with-python-1024x512.png)](https://inspirezone.tech/)
 
 ## Tutorial available
 
